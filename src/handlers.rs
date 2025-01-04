@@ -1,6 +1,6 @@
 use crate::sym_stack::{EvmSymStack, Expr, Kind, SymVal, Term};
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct EvmContext {
     pub code: Vec<u8>,
     pub sym_stack: EvmSymStack,
@@ -10,10 +10,11 @@ pub struct EvmContext {
     pub counter: u64,
 }
 
+#[derive(Debug)]
 pub struct OpcodeHandler {
-    handler: fn(&OpcodeHandler, &mut EvmContext, &mut [Term]),
-    in_args: u8,
-    out_args: u8,
+    pub handler: fn(&OpcodeHandler, &mut EvmContext, &mut [Term]),
+    pub in_args: u8,
+    pub out_args: u8,
     bytecode_reads: u8,
 }
 
@@ -83,41 +84,41 @@ impl OpcodeHandler {
         let mut word: u64 = 0;
         for i in 0..self.bytecode_reads {
             word |= (context.code[context.pc + i as usize + 1]) as u64;
-            if i < self.in_args - 1 {
+            if i < self.bytecode_reads - 1 {
                 word <<= 8;
             }
         }
 
         let concrete_var = Term {
-            symval: SymVal {
+            sym_val: SymVal {
                 value: word,
                 kind: Kind::Concrete,
             },
-            term: Vec::new(),
+            args: Vec::new(),
         };
 
         context.sym_stack.sym_push(concrete_var);
-        context.pc += self.in_args as usize + 1;
+        context.pc += self.bytecode_reads as usize + 1;
     }
 
     fn handle_jump(&self, context: &mut EvmContext, sym_vals: &mut [Term]) {
         let top = context.sym_stack.sym_top();
-        if top.symval.kind == Kind::Symbolic {
+        if top.sym_val.kind == Kind::Symbolic {
             panic!("Symbolic Jump");
         }
 
         self.handle_base(context, sym_vals);
-        context.pc = top.symval.value as usize;
+        context.pc = top.sym_val.value as usize;
     }
 
     fn handle_jumpi(&self, context: &mut EvmContext, sym_vals: &mut [Term]) {
         let top = context.sym_stack.sym_top();
-        if top.symval.kind == Kind::Symbolic {
+        if top.sym_val.kind == Kind::Symbolic {
             panic!("Symbolic Jump");
         }
 
         self.handle_base(context, sym_vals);
-        context.pc = top.symval.value as usize;
+        context.pc = top.sym_val.value as usize;
     }
 }
 

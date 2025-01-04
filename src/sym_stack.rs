@@ -1,25 +1,41 @@
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct EvmSymStack {
     pub values: Vec<Term>,
     pub free_top: usize,
 }
 
-#[derive(Clone)]
+// Symbolic or Concrete Value
+#[derive(Clone, Debug)]
 pub struct Term {
-    pub symval: SymVal,
-    pub term: Vec<Term>,
+    pub sym_val: SymVal,
+    pub args: Vec<Term>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct SymVal {
     pub value: u64,
     pub kind: Kind,
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum Kind {
     Concrete,
     Symbolic,
+}
+
+// An actual integer constant
+#[derive(Debug, Default, Clone)]
+pub struct Constant(pub i64);
+// A variable is represented by its id
+#[derive(Debug, Default, Clone)]
+pub struct Variable(pub u64);
+
+// Differential Logic Constraint of the form a - b <= k
+#[derive(Default, Debug, Clone)]
+pub struct Expr {
+    pub a: Variable,
+    pub b: Variable,
+    pub k: Constant,
 }
 
 impl EvmSymStack {
@@ -77,12 +93,4 @@ impl EvmSymStack {
         self.values[self.free_top - 1] = self.values[self.free_top - 1 - n].clone();
         self.values[self.free_top - 1 - n] = top;
     }
-}
-
-// Differential Logic Constraint of the form a - b <= k
-#[derive(Default)]
-pub struct Expr {
-    a: u64,
-    b: u64,
-    k: i64,
 }
