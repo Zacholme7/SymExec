@@ -1,77 +1,67 @@
-// difference logic
-// https://people.eecs.berkeley.edu/~alanmi/publications/other/2013_mihal_smt.pdf
+mod opcodes;
+mod handlers;
+mod sym_stack;
+use std::fs;
+use std::env;
+use anyhow::Result;
 
-// need to symbolically encode
+use crate::handlers::*;
+use crate::opcodes::*;
+use crate::sym_stack::*;
 
-// concolic execution: combination of concrete testing which is fuzzing, and symbolic execution
-// merge the scalability challenges of symbolic execution and randomness of fuzzing
+fn main() -> Result<()> {
+    let args: Vec<String> = env::args().collect();
+    if args.len() != 2 {
+        return Ok(());
+    }
 
-// path constraints collected
-// at every JUMPI, ask differential logic solver if condition can ever be true
-// DL solver takes expressions in form a - b <= k
-// a, b are variables, k is a constant
+    let runtime_string = fs::read_to_string(&args[1])?
+        .trim_start_matches("0x").to_string();
+    let runtime = hex::decode(runtime_string)?;
 
-// represent contraints as weighted graph
-// every constraint a - b <= k is an edge a -> b with weight k, check if
-// the graph has a negative cycle. bellman ford negative cycle detection
+    run(runtime);
+    Ok(())
 
-const STACK_SIZE: usize = 1024;
-
-#[derive(Default)]
-pub struct EvmSymStack {
-    values: Vec<Term>,
-    free_top: u16,
 }
 
-#[derive(Default)]
-pub struct EvmContext {
-    code: Vec<u8>,
-    sym_stack: EvmSymStack,
-    pc: usize,
-    path: Vec<u64>,
-    constraints: Vec<Expr>,
-    counter: u64,
-}
-
-// Differential Logic Constraint of the form a - b <= k
-#[derive(Default)]
-pub struct Expr {
-    a: u64,
-    b: u64,
-    k: i64,
-}
-
-enum Kind {
-    Concrete,
-    Symbolic,
-}
-
-pub struct SymVal {
-    value: usize,
-    kind: Kind,
-}
-
-pub struct Term {
-    symval: SymVal,
-    term: Vec<Term>,
-}
-
-fn main() {
-    println!("Hello, world!");
-
-    let args: Vec<String> = std::env::args().collect();
-    let path = args[0].clone();
-
-    // get the bytecode from cli
-}
-
-fn run(runtime: Vec<u8>) {
-    // Construct a new Symbolic Execution Context
-    let context = EvmContext {
+fn run(runtime: Vec<u8>) -> u64 {
+    let mut context = EvmContext {
         counter: 1,
+        code: runtime,
         ..Default::default()
     };
 
     // Interpret the runtime bytecode
-    while context.pc < context.code.len() {}
+    while context.pc < context.code.len() {
+        let opcode = context.code[context.pc];
+
+        if search_path(&context.path, &context.pc) {
+            return context.counter;
+        }
+        context.path.push(context.pc);
+
+
+        // dont create symbolic values for push, dup, swap
+        if PUSH1 <= opcode && opcode <= SWAP16 {
+            let mut n = 0;
+            if PUSH1 <= opcode && opcode <= PUSH32 {
+                n = opcode - PUSH1 + 1;
+            } else if DUP1 <= opcode && opcode <= DUP1 {
+                n = opcode - DUP1 + 1;
+            } else if SWAP1 <= opcode && opcode <= SWAP16 {
+                n = opcode - SWAP1 + 1;
+            }
+            // do the handler
+            continue;
+        }
+
+        // the other opcodes have either 0 or 1 output values
+
+
+    }
+    context.counter
+}
+
+fn search_path(path: &[usize], pc: &usize) -> bool {
+    todo!()
 }

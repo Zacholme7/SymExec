@@ -1,0 +1,16 @@
+// difference logic
+// https://people.eecs.berkeley.edu/~alanmi/publications/other/2013_mihal_smt.pdf
+
+// need to symbolically encode
+
+// concolic execution: combination of concrete testing which is fuzzing, and symbolic execution
+// merge the scalability challenges of symbolic execution and randomness of fuzzing
+
+// path constraints collected
+// at every JUMPI, ask differential logic solver if condition can ever be true
+// DL solver takes expressions in form a - b <= k
+// a, b are variables, k is a constant
+
+// represent contraints as weighted graph
+// every constraint a - b <= k is an edge a -> b with weight k, check if
+// the graph has a negative cycle. bellman ford negative cycle detection
