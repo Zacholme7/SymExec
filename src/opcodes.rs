@@ -14,7 +14,7 @@ pub const MULMOD: u8 = 0x09;
 pub const EXP: u8 = 0x0a;
 pub const SIGNEXTEND: u8 = 0x0b;
 
-// Relational  
+// Relational
 pub const LT: u8 = 0x10;
 pub const GT: u8 = 0x11;
 pub const SLT: u8 = 0x12;
@@ -170,3 +170,4 @@ pub const SELFDESTRUCT: u8 = 0xff;
 pub fn is_relational(opcode: u8) -> bool {
     opcode == LT || opcode == SLT || opcode == GT || opcode == SGT
 }
+

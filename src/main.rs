@@ -1,9 +1,9 @@
-mod opcodes;
 mod handlers;
+mod opcodes;
 mod sym_stack;
-use std::fs;
-use std::env;
 use anyhow::Result;
+use std::env;
+use std::fs;
 
 use crate::handlers::*;
 use crate::opcodes::*;
@@ -16,20 +16,24 @@ fn main() -> Result<()> {
     }
 
     let runtime_string = fs::read_to_string(&args[1])?
-        .trim_start_matches("0x").to_string();
+        .trim_start_matches("0x")
+        .to_string();
     let runtime = hex::decode(runtime_string)?;
 
     run(runtime);
     Ok(())
-
 }
 
 fn run(runtime: Vec<u8>) -> u64 {
+    // Create the Symbolic Evm Context
     let mut context = EvmContext {
         counter: 1,
         code: runtime,
         ..Default::default()
     };
+
+    // Create all of the handlers
+    let handlers = sym_handlers();
 
     // Interpret the runtime bytecode
     while context.pc < context.code.len() {
@@ -40,15 +44,16 @@ fn run(runtime: Vec<u8>) -> u64 {
         }
         context.path.push(context.pc);
 
+        let handler = &handlers[opcode as usize];
 
         // dont create symbolic values for push, dup, swap
-        if PUSH1 <= opcode && opcode <= SWAP16 {
+        if (PUSH1..=SWAP16).contains(&opcode) {
             let mut n = 0;
-            if PUSH1 <= opcode && opcode <= PUSH32 {
+            if (PUSH1..=PUSH32).contains(&opcode) {
                 n = opcode - PUSH1 + 1;
-            } else if DUP1 <= opcode && opcode <= DUP1 {
+            } else if (DUP1..=DUP16).contains(&opcode) {
                 n = opcode - DUP1 + 1;
-            } else if SWAP1 <= opcode && opcode <= SWAP16 {
+            } else if (SWAP1..=SWAP16).contains(&opcode) {
                 n = opcode - SWAP1 + 1;
             }
             // do the handler
@@ -56,8 +61,6 @@ fn run(runtime: Vec<u8>) -> u64 {
         }
 
         // the other opcodes have either 0 or 1 output values
-
-
     }
     context.counter
 }

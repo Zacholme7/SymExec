@@ -1,32 +1,29 @@
-
 #[derive(Default)]
 pub struct EvmSymStack {
     pub values: Vec<Term>,
     pub free_top: usize,
 }
 
-
 #[derive(Clone)]
 pub struct Term {
-    symval: SymVal,
-    term: Vec<Term>,
+    pub symval: SymVal,
+    pub term: Vec<Term>,
 }
 
 #[derive(Clone)]
 pub struct SymVal {
-    value: usize,
-    kind: Kind,
+    pub value: u64,
+    pub kind: Kind,
 }
 
-#[derive(Clone)]
-enum Kind {
+#[derive(Clone, PartialEq)]
+pub enum Kind {
     Concrete,
     Symbolic,
 }
 
-
 impl EvmSymStack {
-    pub fn sym_top(&self) ->  Term {
+    pub fn sym_top(&self) -> Term {
         if self.free_top == 0 {
             panic!("Stack Underflow")
         }
@@ -50,7 +47,7 @@ impl EvmSymStack {
         self.free_top -= 1;
     }
 
-    pub fn sym_dup(&mut self, n: usize) {
+    pub fn sym_dup(&mut self, n: u8) {
         if self.free_top >= 1024 {
             panic!("Stack Overflow");
         }
@@ -59,7 +56,7 @@ impl EvmSymStack {
             panic!("Invalid Argument");
         }
 
-        if self.free_top < n {
+        if self.free_top < n as usize {
             panic!("Stack Underflow");
         }
 
@@ -82,13 +79,6 @@ impl EvmSymStack {
     }
 }
 
-
-
-
-
-
-
-
 // Differential Logic Constraint of the form a - b <= k
 #[derive(Default)]
 pub struct Expr {
@@ -96,6 +86,3 @@ pub struct Expr {
     b: u64,
     k: i64,
 }
-
-
-
