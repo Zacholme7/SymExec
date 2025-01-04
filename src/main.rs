@@ -9,6 +9,7 @@ use std::fs;
 use crate::handlers::*;
 use crate::opcodes::*;
 use crate::sym_stack::{Constant, Expr, Kind, SymVal, Term, Variable};
+use crate::solve::solve;
 
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
@@ -96,6 +97,9 @@ fn run(context: &mut EvmContext, handlers: [OpcodeHandler; 256]) -> u64 {
 
                 if !expression.is_empty() {
                     new_constraints.append(&mut expression);
+                    let result = solve(&new_constraints);
+                    println!("RESULT {:?}", result);
+
                     // check
                 } else {
                     new_constraints = context.constraints.clone();
