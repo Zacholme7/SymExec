@@ -1,6 +1,7 @@
 mod handlers;
 mod opcodes;
 mod sym_stack;
+mod solve;
 use anyhow::Result;
 use std::env;
 use std::fs;
@@ -22,11 +23,6 @@ fn main() -> Result<()> {
         .to_string();
     let runtime = hex::decode(runtime_string)?;
 
-    run(runtime);
-    Ok(())
-}
-
-fn run(runtime: Vec<u8>) -> u64 {
     // Create the Symbolic Evm Context
     let mut context = EvmContext {
         counter: 1,
@@ -36,10 +32,15 @@ fn run(runtime: Vec<u8>) -> u64 {
 
     // Create all of the handlers
     let handlers = sym_handlers();
+    run(&mut context, handlers);
+    Ok(())
+}
 
+fn run(context: &mut EvmContext, handlers: [OpcodeHandler; 256]) -> u64 {
     // Interpret the runtime bytecode
     while context.pc < context.code.len() {
         let opcode = context.code[context.pc];
+        println!("PC {}, Opcode {}", context.pc, opcode);
 
         // No loops
         if search_path(&context.path, &context.pc) {
@@ -50,10 +51,11 @@ fn run(runtime: Vec<u8>) -> u64 {
 
         // Extract the handler for this opcode
         let handler = &handlers[opcode as usize];
+        println!("handler {:?}", handler);
 
         // We dont create symbolic values for push, dup, swap.
         if (PUSH1..=SWAP16).contains(&opcode) {
-            (handler.handler)(handler, &mut context, &mut []);
+            (handler.handler)(handler, context, &mut []);
             continue;
         }
 
@@ -77,20 +79,41 @@ fn run(runtime: Vec<u8>) -> u64 {
             sym_op.push(tmp);
         }
 
+
         let prev_pc = context.pc;
-        (handler.handler)(handler, &mut context, &mut sym_op);
+        (handler.handler)(handler, context, &mut sym_op);
 
         if opcode == JUMPI {
+            println!("is a jump");
             let mut new_constraints: Vec<Expr> = Vec::new();
 
             let condition_opcode: u8 = sym_args[1].sym_val.value as u8;
 
             if is_relational(condition_opcode) || condition_opcode == ISZERO {
+                println!("is relational");
                 // at a branching point, convert to expression
-                let expression = term_to_expression(sym_args[1].clone());
+                let mut expression = term_to_expression(sym_args[1].clone());
+
+                if !expression.is_empty() {
+                    new_constraints.append(&mut expression);
+                    // check
+                } else {
+                    new_constraints = context.constraints.clone();
+                }
             } else {
                 new_constraints = context.constraints.clone();
             }
+            println!("new constarints {:?}", new_constraints);
+
+            let mut new_context = EvmContext {
+                code: context.code.clone(),
+                sym_stack: context.sym_stack.clone(),
+                pc: context.pc,
+                path: context.path.clone(),
+                constraints: new_constraints,
+                counter: context.counter,
+            };
+            context.counter = run(&mut new_context, handlers.clone());
 
             context.pc = prev_pc + 1;
         } else if [RETURN, REVERT, INVALID, STOP, SELFDESTRUCT].contains(&opcode) {

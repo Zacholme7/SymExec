@@ -10,7 +10,7 @@ pub struct EvmContext {
     pub counter: u64,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OpcodeHandler {
     pub handler: fn(&OpcodeHandler, &mut EvmContext, &mut [Term]),
     pub in_args: u8,
@@ -127,40 +127,40 @@ pub fn sym_handlers() -> [OpcodeHandler; 256] {
     [
         // 0x00 - 0x0F: Stop and Arithmetic Operations
         OpcodeHandler::new(HandlerType::Terminating, 0, 0, 0), // 0x00 STOP: Halts execution
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0),        // 0x01 ADD: a + b
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0),        // 0x02 MUL: a * b
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0),        // 0x03 SUB: a - b
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0),        // 0x04 DIV: a ÷ b
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0),        // 0x05 SDIV: a ÷ b (signed)
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0),        // 0x06 MOD: a % b
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0),        // 0x07 SMOD: a % b (signed)
-        OpcodeHandler::new(HandlerType::Base, 3, 1, 0),        // 0x08 ADDMOD: (a + b) % N
-        OpcodeHandler::new(HandlerType::Base, 3, 1, 0),        // 0x09 MULMOD: (a * b) % N
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0),        // 0x0A EXP: a ^ b
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0), // 0x0B SIGNEXTEND: Extends length of two's complement signed integer
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x01 ADD: a + b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x02 MUL: a * b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x03 SUB: a - b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x04 DIV: a ÷ b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x05 SDIV: a ÷ b (signed)
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x06 MOD: a % b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x07 SMOD: a % b (signed)
+        OpcodeHandler::new(HandlerType::Unimplemented, 3, 1, 0),        // 0x08 ADDMOD: (a + b) % N
+        OpcodeHandler::new(HandlerType::Unimplemented, 3, 1, 0),        // 0x09 MULMOD: (a * b) % N
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x0A EXP: a ^ b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x0B SIGNEXTEND: Extends length of two's complement signed integer
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x0C (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x0D (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x0E (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x0F (Invalid)
         // 0x10 - 0x1F: Comparison & Bitwise Logic Operations
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0), // 0x10 LT: a < b
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0), // 0x11 GT: a > b
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0), // 0x12 SLT: a < b (signed)
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0), // 0x13 SGT: a > b (signed)
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0), // 0x14 EQ: a == b
-        OpcodeHandler::new(HandlerType::Base, 1, 1, 0), // 0x15 ISZERO: a == 0
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0), // 0x16 AND: a & b
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0), // 0x17 OR: a | b
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0), // 0x18 XOR: a ^ b
-        OpcodeHandler::new(HandlerType::Base, 1, 1, 0), // 0x19 NOT: ~a
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0), // 0x1A BYTE: Get byte at index
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0), // 0x1B SHL: Left shift
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0), // 0x1C SHR: Right shift
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0), // 0x1D SAR: Arithmetic right shift
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x10 LT: a < b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x11 GT: a > b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x12 SLT: a < b (signed)
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x13 SGT: a > b (signed)
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x14 EQ: a == b
+        OpcodeHandler::new(HandlerType::Unimplemented, 1, 1, 0), // 0x15 ISZERO: a == 0
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x16 AND: a & b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x17 OR: a | b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x18 XOR: a ^ b
+        OpcodeHandler::new(HandlerType::Unimplemented, 1, 1, 0), // 0x19 NOT: ~a
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x1A BYTE: Get byte at index
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x1B SHL: Left shift
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x1C SHR: Right shift
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x1D SAR: Arithmetic right shift
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x1E (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x1F (Invalid)
         // 0x20: SHA3
-        OpcodeHandler::new(HandlerType::Base, 2, 1, 0), // 0x20 SHA3: Computes Keccak-256 hash
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x20 SHA3: Computes Keccak-256 hash
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x21 (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x22 (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x23 (Invalid)
@@ -177,32 +177,32 @@ pub fn sym_handlers() -> [OpcodeHandler; 256] {
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x2E (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x2F (Invalid)
         // 0x30 - 0x3F: Environmental Information
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x30 ADDRESS: Get address of currently executing account
-        OpcodeHandler::new(HandlerType::Base, 1, 1, 0), // 0x31 BALANCE: Get balance of given account
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x32 ORIGIN: Get execution origination address
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x33 CALLER: Get caller address
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x34 CALLVALUE: Get deposited value by the instruction/transaction
-        OpcodeHandler::new(HandlerType::Base, 1, 1, 0), // 0x35 CALLDATALOAD: Get input data of current environment
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x36 CALLDATASIZE: Get size of input data
-        OpcodeHandler::new(HandlerType::Base, 3, 0, 0), // 0x37 CALLDATACOPY: Copy input data to memory
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x38 CODESIZE: Get size of code running in current environment
-        OpcodeHandler::new(HandlerType::Base, 3, 0, 0), // 0x39 CODECOPY: Copy code running in current environment to memory
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x3A GASPRICE: Get price of gas in current environment
-        OpcodeHandler::new(HandlerType::Base, 1, 1, 0), // 0x3B EXTCODESIZE: Get size of an account's code
-        OpcodeHandler::new(HandlerType::Base, 4, 0, 0), // 0x3C EXTCODECOPY: Copy an account's code to memory
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x3D RETURNDATASIZE: Get size of output data from previous call
-        OpcodeHandler::new(HandlerType::Base, 3, 0, 0), // 0x3E RETURNDATACOPY: Copy output data from previous call to memory
-        OpcodeHandler::new(HandlerType::Base, 1, 1, 0), // 0x3F EXTCODEHASH: Get hash of an account's code
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x30 ADDRESS: Get address of currently executing accounthandler
+        OpcodeHandler::new(HandlerType::Unimplemented, 1, 1, 0), // 0x31 BALANCE: Get balance of given account
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x32 ORIGIN: Get execution origination address
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x33 CALLER: Get caller address
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x34 CALLVALUE: Get deposited value by the instruction/transaction
+        OpcodeHandler::new(HandlerType::Unimplemented, 1, 1, 0), // 0x35 CALLDATALOAD: Get input data of current environment
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x36 CALLDATASIZE: Get size of input data
+        OpcodeHandler::new(HandlerType::Unimplemented, 3, 0, 0), // 0x37 CALLDATACOPY: Copy input data to memory
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x38 CODESIZE: Get size of code running in current environment
+        OpcodeHandler::new(HandlerType::Unimplemented, 3, 0, 0), // 0x39 CODECOPY: Copy code running in current environment to memory
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x3A GASPRICE: Get price of gas in current environment
+        OpcodeHandler::new(HandlerType::Unimplemented, 1, 1, 0), // 0x3B EXTCODESIZE: Get size of an account's code
+        OpcodeHandler::new(HandlerType::Unimplemented, 4, 0, 0), // 0x3C EXTCODECOPY: Copy an account's code to memory
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x3D RETURNDATASIZE: Get size of output data from previous call
+        OpcodeHandler::new(HandlerType::Unimplemented, 3, 0, 0), // 0x3E RETURNDATACOPY: Copy output data from previous call to memory
+        OpcodeHandler::new(HandlerType::Unimplemented, 1, 1, 0), // 0x3F EXTCODEHASH: Get hash of an account's code
         // 0x40 - 0x47: Block Information
-        OpcodeHandler::new(HandlerType::Base, 1, 1, 0), // 0x40 BLOCKHASH: Get hash of recent block
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x41 COINBASE: Get current block's beneficiary address
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x42 TIMESTAMP: Get block's timestamp
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x43 NUMBER: Get current block number
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x44 DIFFICULTY: Get current block's difficulty
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x45 GASLIMIT: Get current block's gas limit
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x46 CHAINID: Get current chain ID
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x47 SELFBALANCE: Get balance of currently executing account
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0), // 0x48 BASEFEE: Get base fee
+        OpcodeHandler::new(HandlerType::Unimplemented, 1, 1, 0), // 0x40 BLOCKHASH: Get hash of recent block
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x41 COINBASE: Get current block's beneficiary address
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x42 TIMESTAMP: Get block's timestamp
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x43 NUMBER: Get current block number
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x44 DIFFICULTY: Get current block's difficulty
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x45 GASLIMIT: Get current block's gas limit
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x46 CHAINID: Get current chain ID
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x47 SELFBALANCE: Get balance of currently executing account
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x48 BASEFEE: Get base fee
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x49 (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x4A (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x4B (Invalid)
@@ -211,18 +211,18 @@ pub fn sym_handlers() -> [OpcodeHandler; 256] {
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x4E (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x4F (Invalid)
         // 0x50 - 0x5F: Stack, Memory, Storage and Flow Operations
-        OpcodeHandler::new(HandlerType::Base, 1, 0, 0), // 0x50 POP: Remove item from stack
-        OpcodeHandler::new(HandlerType::Base, 1, 1, 0), // 0x51 MLOAD: Load word from memory
-        OpcodeHandler::new(HandlerType::Base, 2, 0, 0), // 0x52 MSTORE: Save word to memory
-        OpcodeHandler::new(HandlerType::Base, 2, 0, 0), // 0x53 MSTORE8: Save byte to memory
-        OpcodeHandler::new(HandlerType::Base, 1, 1, 0), // 0x54 SLOAD: Load word from storage
-        OpcodeHandler::new(HandlerType::Base, 2, 0, 0), // 0x55 SSTORE: Save word to storage
+        OpcodeHandler::new(HandlerType::Unimplemented, 1, 0, 0), // 0x50 POP: Remove item from stack
+        OpcodeHandler::new(HandlerType::Unimplemented, 1, 1, 0), // 0x51 MLOAD: Load word from memory
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 0, 0), // 0x52 MSTORE: Save word to memory
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 0, 0), // 0x53 MSTORE8: Save byte to memory
+        OpcodeHandler::new(HandlerType::Unimplemented, 1, 1, 0), // 0x54 SLOAD: Load word from storage
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 0, 0), // 0x55 SSTORE: Save word to storage
         OpcodeHandler::new(HandlerType::Jump, 1, 0, 0), // 0x56 JUMP: Alter program counter
         OpcodeHandler::new(HandlerType::JumpI, 2, 0, 0), // 0x57 JUMPI: Conditionally alter program counter
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0),  // 0x58 PC: Get program counter
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0),  // 0x59 MSIZE: Get memory size
-        OpcodeHandler::new(HandlerType::Base, 0, 1, 0),  // 0x5A GAS: Get available gas
-        OpcodeHandler::new(HandlerType::Base, 0, 0, 0), // 0x5B JUMPDEST: Mark valid jump destination
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0),  // 0x58 PC: Get program counter
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0),  // 0x59 MSIZE: Get memory size
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0),  // 0x5A GAS: Get available gas
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x5B JUMPDEST: Mark valid jump destination
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x5C (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x5D (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x5E (Invalid)
@@ -297,11 +297,11 @@ pub fn sym_handlers() -> [OpcodeHandler; 256] {
         OpcodeHandler::new(HandlerType::Swap, 16, 16, 0), // 0x9E SWAP15: Exchange 1st and 16th stack items
         OpcodeHandler::new(HandlerType::Swap, 17, 17, 0), // 0x9F SWAP16: Exchange 1st and 17th stack items
         // 0xA0 - 0xA4: Logging Operations
-        OpcodeHandler::new(HandlerType::Base, 2, 0, 0), // 0xA0 LOG0: Append log record with no topics
-        OpcodeHandler::new(HandlerType::Base, 3, 0, 0), // 0xA1 LOG1: Append log record with one topic
-        OpcodeHandler::new(HandlerType::Base, 4, 0, 0), // 0xA2 LOG2: Append log record with two topics
-        OpcodeHandler::new(HandlerType::Base, 5, 0, 0), // 0xA3 LOG3: Append log record with three topics
-        OpcodeHandler::new(HandlerType::Base, 6, 0, 0), // 0xA4 LOG4: Append log record with four topics
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 0, 0), // 0xA0 LOG0: Append log record with no topics
+        OpcodeHandler::new(HandlerType::Unimplemented, 3, 0, 0), // 0xA1 LOG1: Append log record with one topic
+        OpcodeHandler::new(HandlerType::Unimplemented, 4, 0, 0), // 0xA2 LOG2: Append log record with two topics
+        OpcodeHandler::new(HandlerType::Unimplemented, 5, 0, 0), // 0xA3 LOG3: Append log record with three topics
+        OpcodeHandler::new(HandlerType::Unimplemented, 6, 0, 0), // 0xA4 LOG4: Append log record with four topics
         // 0xA5 - 0xEF: Invalid range
         // Fill with unimplemented handlers
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0xA5 (Invalid)
@@ -380,18 +380,18 @@ pub fn sym_handlers() -> [OpcodeHandler; 256] {
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0xEE (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0xEF (Invalid)
         // 0xF0 - 0xFF: System operations
-        OpcodeHandler::new(HandlerType::Base, 3, 1, 0), // 0xF0 CREATE: Create new contract
-        OpcodeHandler::new(HandlerType::Base, 7, 1, 0), // 0xF1 CALL: Message-call into account
-        OpcodeHandler::new(HandlerType::Base, 7, 1, 0), // 0xF2 CALLCODE: Message-call with alternative account's code
+        OpcodeHandler::new(HandlerType::Unimplemented, 3, 1, 0), // 0xF0 CREATE: Create new contract
+        OpcodeHandler::new(HandlerType::Unimplemented, 7, 1, 0), // 0xF1 CALL: Message-call into account
+        OpcodeHandler::new(HandlerType::Unimplemented, 7, 1, 0), // 0xF2 CALLCODE: Message-call with alternative account's code
         OpcodeHandler::new(HandlerType::Terminating, 2, 0, 0), // 0xF3 RETURN: Halt execution returning output data
-        OpcodeHandler::new(HandlerType::Base, 6, 1, 0), // 0xF4 DELEGATECALL: Message-call into this account with an alternative account's code
-        OpcodeHandler::new(HandlerType::Base, 4, 1, 0), // 0xF5 CREATE2: Create new contract with salt
+        OpcodeHandler::new(HandlerType::Unimplemented, 6, 1, 0), // 0xF4 DELEGATECALL: Message-call into this account with an alternative account's code
+        OpcodeHandler::new(HandlerType::Unimplemented, 4, 1, 0), // 0xF5 CREATE2: Create new contract with salt
         // 0xF6-0xF9 Invalid
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0xF6 (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0xF7 (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0xF8 (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0xF9 (Invalid)
-        OpcodeHandler::new(HandlerType::Base, 6, 1, 0), // 0xFA STATICCALL: Static message-call into account
+        OpcodeHandler::new(HandlerType::Unimplemented, 6, 1, 0), // 0xFA STATICCALL: Static message-call into account
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0xFB (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0xFC (Invalid)
         OpcodeHandler::new(HandlerType::Terminating, 2, 0, 0), // 0xFD REVERT: Halt execution reverting state changes

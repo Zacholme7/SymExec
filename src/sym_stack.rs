@@ -1,4 +1,4 @@
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct EvmSymStack {
     pub values: Vec<Term>,
     pub free_top: usize,
@@ -68,7 +68,7 @@ impl EvmSymStack {
             panic!("Stack Overflow");
         }
 
-        if !(1..16).contains(&n) {
+        if !(1..=16).contains(&n) {
             panic!("Invalid Argument");
         }
 
@@ -76,12 +76,13 @@ impl EvmSymStack {
             panic!("Stack Underflow");
         }
 
-        let top = self.sym_top();
-        self.values.push(top);
+        let to_duplicate = self.values[self.free_top - n as usize].clone();
+        self.values.push(to_duplicate);
+        self.free_top += 1;
     }
 
     pub fn sym_swap(&mut self, n: usize) {
-        if !(1..16).contains(&n) {
+        if !(1..=16).contains(&n) {
             panic!("Invalid Argument");
         }
 
