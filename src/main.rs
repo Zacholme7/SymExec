@@ -42,6 +42,10 @@ fn run(context: &mut EvmContext, handlers: [OpcodeHandler; 256]) -> u64 {
     while context.pc < context.code.len() {
         let opcode = context.code[context.pc];
 
+        println!(
+            "Opcode {:?}, PC: {:?}, stack {:?}",
+            opcode, context.pc, context.sym_stack
+        );
         // No loops
         if search_path(&context.path, &context.pc) {
             return context.counter;

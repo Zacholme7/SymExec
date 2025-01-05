@@ -95,8 +95,16 @@ impl EvmSymStack {
             panic!("Stack Underflow in sym_swap");
         }
 
-        let top = self.sym_top();
-        self.values[self.free_top - 1] = self.values[self.free_top - 1 - n].clone();
-        self.values[self.free_top - 1 - n] = top;
+        // Save both values we need to swap
+        let top_idx = self.free_top - 1;
+        let swap_idx = self.free_top - 1 - n;
+
+        // Create explicit temporary copies
+        let value1 = self.values[top_idx].clone();
+        let value2 = self.values[swap_idx].clone();
+
+        // Perform the actual swap
+        self.values[top_idx] = value2;
+        self.values[swap_idx] = value1;
     }
 }
