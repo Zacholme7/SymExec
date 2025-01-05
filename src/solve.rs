@@ -1,13 +1,11 @@
-
 use crate::sym_stack::Expr;
 use std::cmp;
 
 #[derive(Debug)]
 pub enum DLResult {
     Sat,
-    Unsat
+    Unsat,
 }
-
 
 pub fn solve(exprs: &[Expr]) -> DLResult {
     let n_exprs = exprs.len();
@@ -30,8 +28,6 @@ pub fn solve(exprs: &[Expr]) -> DLResult {
         adj[expr.a.0 as usize][expr.b.0 as usize] = expr.k.0;
     }
 
-    // ==== Bellman-Ford negative cycle detection ====
-    
     // 1. Single source shortest path
     let mut dist: Vec<i64> = vec![0; n_nodes];
 
@@ -60,4 +56,3 @@ pub fn solve(exprs: &[Expr]) -> DLResult {
         DLResult::Sat
     }
 }
-

@@ -1,15 +1,15 @@
 mod handlers;
 mod opcodes;
-mod sym_stack;
 mod solve;
+mod sym_stack;
 use anyhow::Result;
 use std::env;
 use std::fs;
 
 use crate::handlers::*;
 use crate::opcodes::*;
-use crate::sym_stack::{Constant, Expr, Kind, SymVal, Term, Variable};
 use crate::solve::solve;
+use crate::sym_stack::{Constant, Expr, Kind, SymVal, Term, Variable};
 
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
@@ -41,7 +41,6 @@ fn run(context: &mut EvmContext, handlers: [OpcodeHandler; 256]) -> u64 {
     // Interpret the runtime bytecode
     while context.pc < context.code.len() {
         let opcode = context.code[context.pc];
-        println!("PC {}, Opcode {}", context.pc, opcode);
 
         // No loops
         if search_path(&context.path, &context.pc) {
@@ -52,7 +51,6 @@ fn run(context: &mut EvmContext, handlers: [OpcodeHandler; 256]) -> u64 {
 
         // Extract the handler for this opcode
         let handler = &handlers[opcode as usize];
-        println!("handler {:?}", handler);
 
         // We dont create symbolic values for push, dup, swap.
         if (PUSH1..=SWAP16).contains(&opcode) {
@@ -80,34 +78,28 @@ fn run(context: &mut EvmContext, handlers: [OpcodeHandler; 256]) -> u64 {
             sym_op.push(tmp);
         }
 
-
         let prev_pc = context.pc;
         (handler.handler)(handler, context, &mut sym_op);
 
         if opcode == JUMPI {
-            println!("is a jump");
-            let mut new_constraints: Vec<Expr> = Vec::new();
+            let mut new_constraints: Vec<Expr> = context.constraints.clone();
 
             let condition_opcode: u8 = sym_args[1].sym_val.value as u8;
 
             if is_relational(condition_opcode) || condition_opcode == ISZERO {
-                println!("is relational");
                 // at a branching point, convert to expression
-                let mut expression = term_to_expression(sym_args[1].clone());
+                let expression = term_to_expression(sym_args[1].clone());
 
                 if !expression.is_empty() {
-                    new_constraints.append(&mut expression);
+                    new_constraints.extend(expression);
                     let result = solve(&new_constraints);
-                    println!("RESULT {:?}", result);
-
-                    // check
+                    println!("RESULT: {:?}", result);
                 } else {
                     new_constraints = context.constraints.clone();
                 }
             } else {
                 new_constraints = context.constraints.clone();
             }
-            println!("new constarints {:?}", new_constraints);
 
             let mut new_context = EvmContext {
                 code: context.code.clone(),

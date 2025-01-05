@@ -1,15 +1,25 @@
 use crate::sym_stack::{EvmSymStack, Expr, Kind, SymVal, Term};
 
+/// General purpose EvmContext for execution
 #[derive(Default, Debug)]
 pub struct EvmContext {
+    /// The runtime bytecode
     pub code: Vec<u8>,
+    /// The execution stack
     pub sym_stack: EvmSymStack,
+    /// The program counter
     pub pc: usize,
+    /// The current execution path
     pub path: Vec<usize>,
+    /// Collection constraints for the execution path
     pub constraints: Vec<Expr>,
+    /// Counter??
     pub counter: u64,
 }
 
+/// General purpose handler for an opcode.
+/// Takes a function to execute the opcode, the number of input arguments from the stack, the
+/// number of items it puts onto the stack, and the number of bytecode reads if applicable
 #[derive(Debug, Clone)]
 pub struct OpcodeHandler {
     pub handler: fn(&OpcodeHandler, &mut EvmContext, &mut [Term]),
@@ -18,9 +28,9 @@ pub struct OpcodeHandler {
     bytecode_reads: u8,
 }
 
+/// Type of handlers for each opcode
 pub enum HandlerType {
     Unimplemented,
-    Base,
     Push,
     Dup,
     Swap,
@@ -30,10 +40,10 @@ pub enum HandlerType {
 }
 
 impl OpcodeHandler {
+    /// Construct a new handler for a specific the opcode
     pub fn new(handler_type: HandlerType, in_args: u8, out_args: u8, bytecode_reads: u8) -> Self {
         let handler = match handler_type {
             HandlerType::Unimplemented => Self::handle_unimplemented,
-            HandlerType::Base => Self::handle_base,
             HandlerType::Push => Self::handle_push,
             HandlerType::Dup => Self::handle_dup,
             HandlerType::Swap => Self::handle_swap,
@@ -49,6 +59,7 @@ impl OpcodeHandler {
         }
     }
 
+    // Base handler to execute a NoOp opcode
     fn handle_base(&self, context: &mut EvmContext, sym_vals: &mut [Term]) {
         // pop in_args num items off of the stack
         for _ in 0..self.in_args {
@@ -127,16 +138,16 @@ pub fn sym_handlers() -> [OpcodeHandler; 256] {
     [
         // 0x00 - 0x0F: Stop and Arithmetic Operations
         OpcodeHandler::new(HandlerType::Terminating, 0, 0, 0), // 0x00 STOP: Halts execution
-        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x01 ADD: a + b
-        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x02 MUL: a * b
-        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x03 SUB: a - b
-        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x04 DIV: a ÷ b
-        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x05 SDIV: a ÷ b (signed)
-        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x06 MOD: a % b
-        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x07 SMOD: a % b (signed)
-        OpcodeHandler::new(HandlerType::Unimplemented, 3, 1, 0),        // 0x08 ADDMOD: (a + b) % N
-        OpcodeHandler::new(HandlerType::Unimplemented, 3, 1, 0),        // 0x09 MULMOD: (a * b) % N
-        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0),        // 0x0A EXP: a ^ b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x01 ADD: a + b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x02 MUL: a * b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x03 SUB: a - b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x04 DIV: a ÷ b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x05 SDIV: a ÷ b (signed)
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x06 MOD: a % b
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x07 SMOD: a % b (signed)
+        OpcodeHandler::new(HandlerType::Unimplemented, 3, 1, 0), // 0x08 ADDMOD: (a + b) % N
+        OpcodeHandler::new(HandlerType::Unimplemented, 3, 1, 0), // 0x09 MULMOD: (a * b) % N
+        OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x0A EXP: a ^ b
         OpcodeHandler::new(HandlerType::Unimplemented, 2, 1, 0), // 0x0B SIGNEXTEND: Extends length of two's complement signed integer
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x0C (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x0D (Invalid)
@@ -217,11 +228,11 @@ pub fn sym_handlers() -> [OpcodeHandler; 256] {
         OpcodeHandler::new(HandlerType::Unimplemented, 2, 0, 0), // 0x53 MSTORE8: Save byte to memory
         OpcodeHandler::new(HandlerType::Unimplemented, 1, 1, 0), // 0x54 SLOAD: Load word from storage
         OpcodeHandler::new(HandlerType::Unimplemented, 2, 0, 0), // 0x55 SSTORE: Save word to storage
-        OpcodeHandler::new(HandlerType::Jump, 1, 0, 0), // 0x56 JUMP: Alter program counter
+        OpcodeHandler::new(HandlerType::Jump, 1, 0, 0),          // 0x56 JUMP: Alter program counter
         OpcodeHandler::new(HandlerType::JumpI, 2, 0, 0), // 0x57 JUMPI: Conditionally alter program counter
-        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0),  // 0x58 PC: Get program counter
-        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0),  // 0x59 MSIZE: Get memory size
-        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0),  // 0x5A GAS: Get available gas
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x58 PC: Get program counter
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x59 MSIZE: Get memory size
+        OpcodeHandler::new(HandlerType::Unimplemented, 0, 1, 0), // 0x5A GAS: Get available gas
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x5B JUMPDEST: Mark valid jump destination
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x5C (Invalid)
         OpcodeHandler::new(HandlerType::Unimplemented, 0, 0, 0), // 0x5D (Invalid)

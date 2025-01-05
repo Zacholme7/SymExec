@@ -170,4 +170,3 @@ pub const SELFDESTRUCT: u8 = 0xff;
 pub fn is_relational(opcode: u8) -> bool {
     opcode == LT || opcode == SLT || opcode == GT || opcode == SGT
 }
-
